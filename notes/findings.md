@@ -6,7 +6,7 @@ and the Korg System Updater 1.1.0 macOS app. No hardware has been touched yet.
 ## Platform
 
 - **SoC module:** Raspberry Pi Compute Module 3 (`architecture="cm3"` in
-  `ProductVersionInfo.xml` and in each ZIP's `.versioninfo.xml`). The mkII / SE / module
+  Korg's update index (`systemupdater.korg.app/ProductVersionInfo.xml`) and in each ZIP's `.versioninfo.xml`). The mkII / SE / module
   variants are `cm4`.
 - **Kernel:** `4.14.112`, vermagic `SMP preempt mod_unload modversions aarch64`. This is
   **not** PREEMPT_RT, just voluntary/full preempt. It matches `linux-raspberrypi`
@@ -89,7 +89,7 @@ sysfs GPIO (strings in `Wavest8`).
 - Discovery: mDNS/Bonjour service **`_korg-synth._tcp`**, published by the synth via
   avahi and browsed by the updater. With the synth connected:
   `dns-sd -B _korg-synth._tcp`, then `dns-sd -L <name> _korg-synth._tcp` to get the port.
-- Schemas: package `KorgProtocolMessage`, recovered into `analysis/protos/`
+- Schemas: package `KorgProtocolMessage`, recovered locally into `analysis/protos/` by `tools/prepare.py`
   (27 files from the updater, 173 from Wavest8, 216 from Operator6). Services include
   `ProductService` (Reboot, ShowPopupMessage, Randomize, KaossPhysics…), `ObjectService`,
   FileSystem, SoundLibrary, LicenseManager and ParameterDescriptor.
@@ -111,10 +111,23 @@ instrument enumerates as a **USB mass-storage drive**. This is the Raspberry Pi 
 Korg warns that letting the OS "fix" or reformat the drive bricks the unit. Mount it
 read-only and image the raw device.
 
+Strings around the USB Boot component ("Unable to mount the boot partition", "Unable to
+find the software update config file") suggest that the utility writes the update onto the
+FAT boot partition, and that the update is applied early in the next boot.
+
+## RPC client
+
+`tools/korgrpc.py` implements the rpcz framing from upstream rpcz (Korg's `rpcz.tar.gz`
+LFS object in wavestate_OSS returns 404). On a DEALER socket the frames are
+`["", event_id:u64le, rpcz.rpc_request_header, payload]`, and the service is addressed by
+its short name. Subcommands: `discover`, `list`, `call`, and `selftest` (a loopback fake
+server). It has not been tested against hardware yet.
+
 ## Open questions
 
-- [ ] Button combination for USB Boot Mode on each model (see the USB Boot Utility PDF:
-      `storage.korg.com/korgms/support/USB_Boot_Utility/Korg_USB_Boot_Utility_E.pdf`).
+- [ ] Button combination for USB Boot Mode on each model. Korg's PDF doesn't list it; the
+      utility shows it on screen. For the wavestate, one unverified Gearspace report says
+      to hold Performance Mod Knobs + Master + Note Advance at power-on.
 - [ ] Is there a getty on the ACM gadget or on a UART? Is any sshd/dropbear/telnetd in the base rootfs?
 - [ ] RPC TCP port and whether the rpcz endpoint needs authentication.
 - [ ] Contents of `mmcblk0p1`: config.txt, DT overlay for the Wavest8 codec and panel.
