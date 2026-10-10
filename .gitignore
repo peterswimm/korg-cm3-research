@@ -1,0 +1,6 @@
+downloads/
+extracted/
+*.zip
+*.img
+.DS_Store
+.venv/
