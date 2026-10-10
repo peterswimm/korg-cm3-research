@@ -6,7 +6,7 @@ and the Korg System Updater 1.1.0 macOS app. No hardware has been touched yet.
 ## Platform
 
 - **SoC module:** Raspberry Pi Compute Module 3 (`architecture="cm3"` in
-  `ProductVersionInfo.xml` and in each ZIP's `.versioninfo.xml`). The mkII / SE / module
+  Korg's update index (`systemupdater.korg.app/ProductVersionInfo.xml`) and in each ZIP's `.versioninfo.xml`). The mkII / SE / module
   variants are `cm4`.
 - **Kernel:** `4.14.112`, vermagic `SMP preempt mod_unload modversions aarch64`. This is
   **not** PREEMPT_RT, just voluntary/full preempt. It matches `linux-raspberrypi`
@@ -89,7 +89,7 @@ sysfs GPIO (strings in `Wavest8`).
 - Discovery: mDNS/Bonjour service **`_korg-synth._tcp`**, published by the synth via
   avahi and browsed by the updater. With the synth connected:
   `dns-sd -B _korg-synth._tcp`, then `dns-sd -L <name> _korg-synth._tcp` to get the port.
-- Schemas: package `KorgProtocolMessage`, recovered into `analysis/protos/`
+- Schemas: package `KorgProtocolMessage`, recovered locally into `analysis/protos/` by `tools/prepare.py`
   (27 files from the updater, 173 from Wavest8, 216 from Operator6). Services include
   `ProductService` (Reboot, ShowPopupMessage, Randomize, KaossPhysics…), `ObjectService`,
   FileSystem, SoundLibrary, LicenseManager and ParameterDescriptor.

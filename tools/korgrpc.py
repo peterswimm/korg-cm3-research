@@ -6,9 +6,9 @@ Transport (from upstream rpcz connection_manager.cc / rpc_channel_impl.cc):
   server replies -> [b"", event_id:u64le, rpcz.rpc_response_header, response payload]
 The service is addressed by its short name (e.g. "ProductService").
 
-Prereq: compile the recovered protos once:
-  (cd analysis/protos/<set> && find . -name '*.proto' | sed 's|^\\./||' |
-     xargs ../../../.venv/bin/python -m grpc_tools.protoc -I. --python_out=../../../build/py/<set>)
+Prereq: generate the schemas locally from your own saved update ZIP:
+  .venv/bin/python -I tools/prepare.py <instrument>_system_update_<ver>.zip
+  (see docs/obtaining-korg-files.md)
 
 usage:
   korgrpc.py discover [--timeout 5]
@@ -37,7 +37,7 @@ def load_protos(proto_set):
     """Import every generated *_pb2 module so their descriptors land in the default pool."""
     base = ROOT / "build" / "py" / proto_set
     if not base.is_dir():
-        sys.exit(f"missing {base}: compile analysis/protos/{proto_set} first (see module docstring)")
+        sys.exit(f"missing {base}: run tools/prepare.py first (see docs/obtaining-korg-files.md)")
     sys.path.insert(0, str(base))
     for path in sorted(base.rglob("*_pb2.py")):
         mod = ".".join(path.relative_to(base).with_suffix("").parts)

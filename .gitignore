@@ -6,3 +6,7 @@ extracted/
 .venv/
 build/
 notes/docs/
+
+# Korg-derived material: regenerate locally with tools/prepare.py (docs/obtaining-korg-files.md)
+analysis/protos/
+notes/ProductVersionInfo.xml
