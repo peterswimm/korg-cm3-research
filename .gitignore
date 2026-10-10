@@ -4,3 +4,5 @@ extracted/
 *.img
 .DS_Store
 .venv/
+build/
+notes/docs/

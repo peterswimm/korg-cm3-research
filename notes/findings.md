@@ -111,10 +111,23 @@ instrument enumerates as a **USB mass-storage drive**. This is the Raspberry Pi 
 Korg warns that letting the OS "fix" or reformat the drive bricks the unit. Mount it
 read-only and image the raw device.
 
+Strings around the USB Boot component ("Unable to mount the boot partition", "Unable to
+find the software update config file") suggest that the utility writes the update onto the
+FAT boot partition, and that the update is applied early in the next boot.
+
+## RPC client
+
+`tools/korgrpc.py` implements the rpcz framing from upstream rpcz (Korg's `rpcz.tar.gz`
+LFS object in wavestate_OSS returns 404). On a DEALER socket the frames are
+`["", event_id:u64le, rpcz.rpc_request_header, payload]`, and the service is addressed by
+its short name. Subcommands: `discover`, `list`, `call`, and `selftest` (a loopback fake
+server). It has not been tested against hardware yet.
+
 ## Open questions
 
-- [ ] Button combination for USB Boot Mode on each model (see the USB Boot Utility PDF:
-      `storage.korg.com/korgms/support/USB_Boot_Utility/Korg_USB_Boot_Utility_E.pdf`).
+- [ ] Button combination for USB Boot Mode on each model. Korg's PDF doesn't list it; the
+      utility shows it on screen. For the wavestate, one unverified Gearspace report says
+      to hold Performance Mod Knobs + Master + Note Advance at power-on.
 - [ ] Is there a getty on the ACM gadget or on a UART? Is any sshd/dropbear/telnetd in the base rootfs?
 - [ ] RPC TCP port and whether the rpcz endpoint needs authentication.
 - [ ] Contents of `mmcblk0p1`: config.txt, DT overlay for the Wavest8 codec and panel.

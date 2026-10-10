@@ -66,6 +66,8 @@ def field_type(f):
 
 def render_enum(e, ind):
     out = [f"{ind}enum {e.name} {{"]
+    if e.options.allow_alias:
+        out.append(f"{ind}  option allow_alias = true;")
     for v in e.value:
         out.append(f"{ind}  {v.name} = {v.number};")
     out.append(f"{ind}}}")
